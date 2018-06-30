@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<NetworkWatcher>
+	<options Desc="Options for the NetworkWatcher, leafe value blanc if you want to use the default below">
+		<use Desc=" User these optison? true or flase">true</use>
+			<printTime Desc="Time in ms between Consoleprints, enhances readablility">
+				<value>250</value>
+				<default>500</default>
+			</printTime>
+			<cycleTime Desc="Time in Minutes between Workcylces">
+				<value></value>
+				<default>2</default>
+			</cycleTime>
+			<maxCycle Desc="Number of Cycles befor pushlogger reset">
+				<value>1000</value>
+				<default>360</default>
+			</maxCycle>
+			<apiToken Desc="Pushover Aplication Token">
+				<value></value>
+				<default>ao23nv7oi7g5jtqqtmpbdn72aiwsxb</default>
+			</apiToken>
+			<userToken Desc="Pushover User Token">
+				<value></value>
+				<default>u3pxnpzmmuoh62f852zvhagc59ch3p</default>
+			</userToken>
+			<sftpHost Desc="Ip-address of sftp-server">
+				<value>192.168.200.200</value>
+				<default>127.0.0.1</default>
+			</sftpHost>	
+			<sftpUser Desc="Name of sftp-user">
+				<value></value>
+				<default>user</default>
+			</sftpUser>
+			<sftpPw Desc="Password for sftp-user">
+				<value></value>
+				<default>12345678</default>
+			</sftpPw>
+			<sshUser Desc="Name of the ssh-user of Devices">
+				<value></value>
+				<default>admin</default>
+			</sshUser>
+			<sshPW Desc="Pasword for the ssh-user">
+				<value>Netzwerk1!</value>
+				<value>private</value>
+			</sshPW>			
+	</options>
+</NetworkWatcher>
