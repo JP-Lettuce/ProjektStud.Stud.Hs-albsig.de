@@ -160,7 +160,7 @@ public class Controll {
 				while(work) {
 							
 				this.pm.gap();					//print a blank line
-				this.snmp = new SNMPControll(this.twaName, this.twaIP, this.lastfingerprint, this.fingerprintOID, this.push, this.pm);
+				this.snmp = new SNMPControll(this.twaName, this.twaIP, this.lastfingerprint, this.fingerprintOID, this);
 				
 					//workflow controll switch
 					switch(status) {

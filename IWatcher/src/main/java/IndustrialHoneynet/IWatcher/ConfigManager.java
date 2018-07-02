@@ -444,18 +444,19 @@ public class ConfigManager {
 		
 		this.controll.toPrint(" ------ Erstelle neuen File");
 		
-		File filesource = new File("acConf.xml");		//open filepath to source
+		File filesource = new File(this.pathBase + "acConf.xml");		//open filepath to source
 		File filedest = new File(dest);					//open filepath to destination
 
 		try {
 			
 			filedest.createNewFile();					//create the new file
 			FileUtils.copyFile(filesource, filedest);	//copy file from a to b
-
+	
 		}catch(IOException ex) {
 			this.controll.toPrint("!------FILE-FEHLER: " + ex);
 		}
 		this.controll.toPrint(" ------> Neuer File wurde erstellt");
+		
 		return;
 	}//eom saveConf
 	

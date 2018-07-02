@@ -13,8 +13,7 @@ import org.snmp4j.smi.OID;
 public class SNMPControll {
 	//other "need to work with" classes
 	private SNMPManager snmpM;		//SNMPManager manages all snmp funtkions
-	private PushManager push;		//PushManager manages all push funktion
-	private PrintManager pm;		//PrintManager manages all console print funktions
+	private Controll controll;		//Controll to contorll workeflow interaction
 	
 	private String name;			//Name of the target
 	private String ip;				//IP of the target
@@ -40,21 +39,20 @@ public class SNMPControll {
 	 * @param pfingOID
 	 * @param ppush
 	 */
-	public SNMPControll(String pname, String pip, String plastfp, OID pfingOID, PushManager ppush, PrintManager ppm) {
+	public SNMPControll(String pname, String pip, String plastfp, OID pfingOID, Controll pcontroll) {
 		//set global variables for target
 		this.name = pname;
 		this.ip = pip;
 		this.lastfingerprint = plastfp;
 		this.fingerprintOID = pfingOID;
-		this.push = ppush;
-		this.pm = ppm;
+		this.controll = pcontroll;
 		
 		this.snmpM = new SNMPManager("udp:" + this.ip + "/161");	//creat snmp Session to target
 		
 		try {
 			this.snmpM.start();		//start the snmp session
 		} catch (IOException e) {
-			this.pm.print("!--- FEHLER:SNMP-MANAGER: " + e);
+			this.controll.toPrint("!--- FEHLER:SNMP-MANAGER: " + e);
 		}
 		
 	}
@@ -67,7 +65,7 @@ public class SNMPControll {
 	 */
 	public int fingerprintCheck(){
 	    
-	    this.pm.print(" --- Kontroliere Fingerprint von " + this.name);
+	    this.controll.toPrint(" --- Kontroliere Fingerprint von " + this.name);
 	    String def = this.lastfingerprint.toString();	//fingerprint default
 	    String acc = " ";					//fingerprint actual
 	    int status = 900;					//set status to malfunction
@@ -76,18 +74,18 @@ public class SNMPControll {
 		try {
 			acc = this.snmpM.getAsString(this.fingerprintOID);
 		} catch (IOException e) {
-			this.pm.print("!--- FEHLER:SNMP-MANAGER:FINGERPRINT: " + e);
+			this.controll.toPrint("!--- FEHLER:SNMP-MANAGER:FINGERPRINT: " + e);
 		}
 
 	    
 	    if(acc.equals(def)){		//do if fingerprint is OK
 	      status = 2;				//status clearing, next is Syn-check
-	      this.pm.print(" ---> Keine Abweichung gefunden.");
+	      this.controll.toPrint(" ---> Keine Abweichung gefunden.");
 	    }
 	    else{						//do if fingerprint differs
 	      status = 4;				//status update, next is Confcheck
-	      this.pm.print(" ---> Abweichung gefunden."); 
-	      this.push.push(6, "Momentaner Fingerprint: " + acc, this.name, this.ip);
+	      this.controll.toPrint(" ---> Abweichung gefunden."); 
+	      this.controll.toPush(6, "Momentaner Fingerprint: " + acc, this.name, this.ip);
 	    }
 	    return status;				//return next to do
 	  }//eom fingerprint
@@ -101,7 +99,7 @@ public class SNMPControll {
 	 */
 	public int synCheck(){
 	    
-	    this.pm.print(" --- Kontrolliere Synkronitaet von " + this.name);
+	    this.controll.toPrint(" --- Kontrolliere Synkronitaet von " + this.name);
 	    int status = 900; 		//set the status to malfunction
 	    int syn = 900;			//preset the synflag to an error    
 		String flag = "";		//buffer for synflag
@@ -109,25 +107,25 @@ public class SNMPControll {
 		try {
 			flag = this.snmpM.getAsString(this.statusOID);		//load the synflag from traget
 		} catch (IOException e) {
-			this.pm.print("!--- FEHLER:SNMP-MANAGER:SYN: " + e);
+			this.controll.toPrint("!--- FEHLER:SNMP-MANAGER:SYN: " + e);
 		}
 		
 		syn = Integer.parseInt(flag);
 	    
 	    switch(syn) {			//switch syn flag status (1=OK, 2=warning, 3=fatal)
 	    case 1 : status = 3;
-	    		this.pm.print(" ---> Geraet ist in Synk");
+	    		this.controll.toPrint(" ---> Geraet ist in Synk");
 	    		break;
 	    case 2:	status = 4;
-	    		this.pm.print(" ---> Geraet ist nicht in Synk");
-	    		this.push.push(7, "none", this.name, this.ip);
+	    		this.controll.toPrint(" ---> Geraet ist nicht in Synk");
+	    		this.controll.toPush(7, "none", this.name, this.ip);
 	    		break;
 	    case 3: status = 4;
-	    		this.pm.print("!---> WARNUNG! Synflag ist auf hoechster Problemstufe!");
-	    		this.push.push(5, "none", this.name, this.ip);
+	    		this.controll.toPrint("!---> WARNUNG! Synflag ist auf hoechster Problemstufe!");
+	    		this.controll.toPush(5, "none", this.name, this.ip);
 	    		break;
 	    default:status = 4;
-	    		this.pm.print("!---> Synflag wurde fehlerhaft empfangen");
+	    		this.controll.toPrint("!---> Synflag wurde fehlerhaft empfangen");
 	    }//eo switch, synflag
 	    
 	    return status;		//return next to do
@@ -141,7 +139,7 @@ public class SNMPControll {
 	 */
 	public void discEng() {	
 		
-		this.pm.print(" ---- Aktiviere visuellen Marker.");
+		this.controll.toPrint(" ---- Aktiviere visuellen Marker.");
 		int var = 1;
 		this.snmpM.set(this.discoOID, var);
 	}//eom discEng()
@@ -153,7 +151,7 @@ public class SNMPControll {
 	 */
 	public void discDisEng() {
 		
-		this.pm.print(" ---- Deaktiviere visuellen Marker.");
+		this.controll.toPrint(" ---- Deaktiviere visuellen Marker.");
 		//Variable var = new OctetString("2");
 		int var = 2;
 		this.snmpM.set(this.discoOID, var);
